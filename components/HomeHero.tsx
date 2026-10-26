@@ -34,7 +34,7 @@ export default function HomeHero() {
       <div className="wrap grid min-h-[min(calc(100svh-4.5rem),54rem)] items-end gap-10 pt-24 pb-14 md:pb-20 lg:grid-cols-[1fr_auto] lg:gap-16">
         <div className="max-w-4xl">
           <motion.h1 className="display-xl" {...rise(0.15)}>
-            Fruta de los valles de Chile y Perú para los mercados más exigentes
+            Fruta de los valles de Chile para los mercados más exigentes
           </motion.h1>
           <motion.p className="lead mt-6 max-w-2xl text-white/85" {...rise(0.35)}>
             Más de {site.years} años produciendo y exportando cerezas, uvas, manzanas, arándanos y fruta congelada IQF a

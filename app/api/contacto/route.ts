@@ -109,7 +109,12 @@ export async function POST(req: Request) {
   const results = await Promise.allSettled(tasks);
   const delivered = results.some((r) => r.status === "fulfilled" && r.value.ok);
   if (!delivered) {
-    console.error("[contacto] Ningún canal aceptó el lead", results);
+    const detail = await Promise.all(
+      results.map(async (r) =>
+        r.status === "rejected" ? String(r.reason) : `${r.value.status} ${r.value.url}: ${(await r.value.text().catch(() => "")).slice(0, 400)}`
+      )
+    );
+    console.error("[contacto] Ningún canal aceptó el lead:", detail.join(" | "));
     return NextResponse.json({ ok: false, error: "delivery_failed" }, { status: 502 });
   }
   return NextResponse.json({ ok: true });
