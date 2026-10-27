@@ -37,7 +37,7 @@ function FlagPeru() {
 export function Respaldo() {
   return (
     <section aria-labelledby="respaldo" className="bg-huerto text-white">
-      <div className="wrap py-20 md:py-28">
+      <div className="wrap py-16 md:py-28">
         <SectionHead
           id="respaldo"
           light
@@ -45,7 +45,7 @@ export function Respaldo() {
           intro="Producimos en los valles centrales de Chile y en Perú. Así extendemos las temporadas y abastecemos a nuestros clientes más meses del año."
         />
 
-        <div className="mt-14 grid gap-5 md:grid-cols-2">
+        <div className="mt-10 grid gap-4 md:mt-14 md:grid-cols-2 md:gap-5">
           <div className="rounded-3xl bg-white/[.06] p-7 ring-1 ring-white/10">
             <div className="flex items-center gap-3"><FlagChile /><h3 className="font-display text-2xl font-bold">Chile</h3></div>
             <p className="mt-3 text-white/80">
@@ -60,7 +60,7 @@ export function Respaldo() {
           </div>
         </div>
 
-        <div className="mt-20 grid items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
+        <div className="mt-14 grid items-center gap-8 md:mt-20 md:gap-12 lg:grid-cols-[1fr_1.1fr]">
           <div>
             <h3 className="display-md">Certificaciones internacionales</h3>
             <p className="mt-3 max-w-xl text-white/80">
@@ -87,7 +87,7 @@ export function Respaldo() {
           </div>
         </div>
 
-        <div className="mt-20 grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+        <div className="mt-14 grid items-center gap-8 md:mt-20 md:gap-12 lg:grid-cols-[1.1fr_1fr]">
           <div className="order-2 lg:order-1 overflow-hidden rounded-3xl bg-white">
             <Image
               src="/media/mercados.webp"
@@ -118,19 +118,19 @@ export function Respaldo() {
 
 export function CatalogBand() {
   return (
-    <section aria-labelledby="catalogo" className="wrap py-16 md:py-20">
+    <section aria-labelledby="catalogo" className="wrap py-12 md:py-20">
       <div className="relative grid overflow-hidden rounded-[2rem] bg-rojo text-white md:grid-cols-[1.3fr_1fr]">
-        <div className="relative z-10 p-8 sm:p-12">
+        <div className="relative z-10 p-6 sm:p-12">
           <h2 id="catalogo" className="display-lg">Todo nuestro catálogo en un PDF</h2>
           <p className="lead mt-4 max-w-lg text-white/90">
             Variedades, formatos y temporadas de cada fruta, listo para compartir con tu equipo de compras.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href={site.catalog} download className="btn btn-blanco text-lg text-rojo">
+          <div className="mt-7 grid gap-3 sm:mt-8 sm:flex sm:flex-wrap">
+            <a href={site.catalog} download className="btn btn-blanco justify-center text-lg text-rojo">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14" strokeLinecap="round" strokeLinejoin="round" /></svg>
               Descargar catálogo
             </a>
-            <a href={site.catalog} target="_blank" rel="noopener" className="btn btn-linea text-lg">
+            <a href={site.catalog} target="_blank" rel="noopener" className="btn btn-linea justify-center text-lg">
               Ver en el navegador
             </a>
           </div>
@@ -144,16 +144,16 @@ export function CatalogBand() {
 export function NewsTeaser() {
   const post = posts[0];
   return (
-    <section aria-labelledby="noticias" className="wrap py-16 md:py-24">
+    <section aria-labelledby="noticias" className="wrap py-12 md:py-24">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h2 id="noticias" className="display-lg">Noticias</h2>
         <Link href="/noticias" className="font-semibold text-verde underline underline-offset-4 hover:text-huerto">
           Ver todas las noticias
         </Link>
       </div>
-      <Link href={`/noticias/${post.slug}`} className="group mt-10 grid overflow-hidden rounded-3xl bg-white shadow-[inset_0_0_0_1px_var(--color-linea)] md:grid-cols-2">
+      <Link href={`/noticias/${post.slug}`} className="group mt-8 grid overflow-hidden md:mt-10 rounded-3xl bg-white shadow-[inset_0_0_0_1px_var(--color-linea)] md:grid-cols-2">
         <Photo name={post.image} alt="" className="min-h-[16rem]" sizes="(min-width:768px) 50vw, 100vw" />
-        <div className="p-8 sm:p-10">
+        <div className="p-6 sm:p-10">
           <p className="text-sm text-niebla">
             <time dateTime={post.date}>{formatDate(post.date)}</time> — {post.tag}
           </p>
@@ -166,17 +166,17 @@ export function NewsTeaser() {
   );
 }
 
-export function ContactSection({ title = "Cuéntanos qué fruta necesitas" }: { title?: string }) {
+export function ContactSection({ title = "Cuéntanos qué fruta necesitas", product }: { title?: string; product?: string }) {
   return (
-    <section id="cotizar" aria-labelledby="cotizar-titulo" className="bg-hoja-2">
-      <div className="wrap grid gap-12 py-20 md:py-28 lg:grid-cols-[0.8fr_1.2fr]">
+    <section id="cotizar" aria-labelledby="cotizar-titulo" className="scroll-mt-16 bg-hoja-2">
+      <div className="wrap grid gap-8 py-14 md:gap-12 md:py-28 lg:grid-cols-[0.8fr_1.2fr]">
         <div>
           <h2 id="cotizar-titulo" className="display-lg">{title}</h2>
           <p className="lead mt-4 text-niebla">
             Indica la fruta, el destino y el volumen aproximado. Un ejecutivo te responde con disponibilidad, calibres y
             condiciones de despacho.
           </p>
-          <dl className="mt-10 space-y-5">
+          <dl className="mt-6 grid grid-cols-1 gap-4 sm:mt-10 sm:gap-5">
             <div>
               <dt className="text-sm text-niebla">Correo</dt>
               <dd><a href={`mailto:${site.email}`} className="font-display text-2xl font-bold hover:underline underline-offset-4">{site.email}</a></dd>
@@ -187,7 +187,7 @@ export function ContactSection({ title = "Cuéntanos qué fruta necesitas" }: { 
             </div>
           </dl>
         </div>
-        <ContactForm />
+        <ContactForm defaultProduct={product} />
       </div>
     </section>
   );

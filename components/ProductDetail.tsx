@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import Photo from "./Photo";
 import SeasonStrip from "./SeasonStrip";
+import MobileQuoteBar from "./MobileQuoteBar";
 import JsonLd from "./JsonLd";
 import { CatalogBand, ContactSection } from "./Sections";
 import { byCategory, productHref, seasonLabel, type Product } from "@/lib/products";
@@ -47,7 +48,7 @@ export function productMetadata(p: Product): Metadata {
 
 export default function ProductDetail({ product: p }: { product: Product }) {
   const related = byCategory(p.category).filter((x) => x !== p);
-  const quoteHref = `/contacto?producto=${encodeURIComponent(p.formName)}`;
+  const quoteHref = "#cotizar";
   const origins = Array.from(new Set(p.seasons.map((s) => s.origin)));
 
   const jsonLd = [
@@ -76,7 +77,7 @@ export default function ProductDetail({ product: p }: { product: Product }) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <section className="wrap overflow-x-clip pt-8 pb-16 md:pb-24">
+      <section className="wrap overflow-x-clip pt-4 pb-14 sm:pt-8 md:pb-24">
         <nav aria-label="Ruta" className="text-sm text-niebla">
           <ol className="flex flex-wrap gap-2">
             <li><Link href="/" className="hover:text-tinta hover:underline">Inicio</Link></li>
@@ -87,21 +88,37 @@ export default function ProductDetail({ product: p }: { product: Product }) {
           </ol>
         </nav>
 
-        <div className="mt-8 grid items-center gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+        <div className="mt-5 grid items-center gap-7 sm:mt-8 sm:gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+          <div className="relative order-first -mx-5 sm:mx-0 lg:order-last">
+            <span className="absolute -inset-3 -z-10 hidden translate-x-4 translate-y-4 rounded-[2.25rem] opacity-90 sm:block" style={{ background: p.color }} aria-hidden />
+            <Photo
+              name={p.image}
+              alt={`${p.name} ${p.category === "congelados" ? "congeladas" : "frescas"} de CFS`}
+              priority
+              className="aspect-[4/3] sm:aspect-[3000/1580] sm:rounded-[2rem]"
+              sizes="(min-width:1024px) 55vw, 100vw"
+            />
+          </div>
           <div>
             <h1 className="display-xl">{p.name}</h1>
             <p className="mt-3 text-niebla">
               <i>{p.scientific}</i>{" · "}{p.category === "frescos" ? "Fruta fresca" : "Congelado IQF"} de {origins.join(" y ")}
             </p>
-            <p className="lead mt-6 max-w-xl">{p.tagline}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={quoteHref} className="btn btn-rojo text-lg">Cotizar {p.name.toLowerCase()}</Link>
-              <a href={site.catalog} download className="btn btn-linea text-lg text-huerto">Descargar catálogo</a>
+            <p className="lead mt-5 max-w-xl sm:mt-6">{p.tagline}</p>
+            <ul className="mt-5 flex flex-wrap gap-2" aria-label="Temporada">
+              {p.seasons.map((s) => (
+                <li key={s.origin} className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[0.92rem] shadow-[inset_0_0_0_1px_var(--color-linea)]">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: p.color }} aria-hidden />
+                  <span>
+                    <span className="font-semibold">{s.origin}:</span> {seasonLabel(s)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-7 grid gap-3 sm:mt-8 sm:flex sm:flex-wrap">
+              <Link href={quoteHref} className="btn btn-rojo justify-center text-lg">Cotizar {p.name.toLowerCase()}</Link>
+              <a href={site.catalog} download className="btn btn-linea justify-center text-lg text-huerto">Descargar catálogo</a>
             </div>
-          </div>
-          <div className="relative">
-            <span className="absolute -inset-2 sm:-inset-3 -z-10 translate-x-2 translate-y-2 sm:translate-x-4 sm:translate-y-4 rounded-[2.25rem] opacity-90" style={{ background: p.color }} aria-hidden />
-            <Photo name={p.image} alt={`${p.name} ${p.category === "congelados" ? "congeladas" : "frescas"} de CFS`} priority className="aspect-[3000/1580] rounded-[2rem]" sizes="(min-width:1024px) 55vw, 100vw" />
           </div>
         </div>
       </section>
@@ -142,7 +159,7 @@ export default function ProductDetail({ product: p }: { product: Product }) {
         <p className="mt-3 max-w-2xl text-niebla">
           {p.seasons.length === 1 && p.seasons[0].months.length === 12
             ? "Al ser congelado, lo despachamos durante todo el año."
-            : "Meses en que despachamos esta fruta. La línea roja marca el mes actual."}
+            : "Meses en que despachamos esta fruta. El mes actual aparece marcado en rojo."}
         </p>
         <div className="mt-10 rounded-3xl bg-white p-6 sm:p-10 shadow-[inset_0_0_0_1px_var(--color-linea)]">
           <SeasonStrip product={p} />
@@ -173,7 +190,8 @@ export default function ProductDetail({ product: p }: { product: Product }) {
       </section>
 
       <CatalogBand />
-      <ContactSection title={`Cotiza ${p.name.toLowerCase()} con CFS`} />
+      <ContactSection title={`Cotiza ${p.name.toLowerCase()} con CFS`} product={p.formName} />
+      <MobileQuoteBar label={`Cotizar ${p.name.toLowerCase()}`} href={quoteHref} color={p.color} name={p.name} />
     </>
   );
 }

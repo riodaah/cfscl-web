@@ -15,7 +15,7 @@ export default function SeasonNow() {
   const coming = nextMonth ? fresh.filter((p) => isAvailable(p, nextMonth) && !now.includes(p)) : [];
 
   return (
-    <div className="w-full max-w-sm rounded-3xl bg-white/95 p-6 text-tinta shadow-[0_30px_80px_-30px_rgba(0,0,0,.6)] backdrop-blur">
+    <div className="w-full rounded-3xl bg-white/95 p-5 sm:max-w-sm sm:p-6 text-tinta shadow-[0_30px_80px_-30px_rgba(0,0,0,.6)] backdrop-blur">
       <p className="text-sm text-niebla">
         Fruta fresca en temporada{month ? ` en ${MONTHS_LONG[month - 1]}` : ""}
       </p>

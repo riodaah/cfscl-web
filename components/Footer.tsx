@@ -7,8 +7,8 @@ export default function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="bg-huerto text-white/85 mt-auto">
-      <div className="wrap grid gap-12 py-16 md:grid-cols-[1.3fr_1fr_1fr_1fr]">
-        <div className="max-w-xs">
+      <div className="wrap grid grid-cols-2 gap-x-6 gap-y-10 py-12 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:gap-12 md:py-16">
+        <div className="col-span-2 max-w-xs md:col-span-1">
           <div className="inline-flex rounded-2xl bg-white p-3">
             <Image src="/media/logo.png" alt="CFS Central Frutícola Sur" width={72} height={68} unoptimized className="h-16 w-auto" />
           </div>
@@ -20,10 +20,10 @@ export default function Footer() {
 
         <div>
           <h2 className="font-display text-lg text-white">Frescos</h2>
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-3 space-y-1">
             {byCategory("frescos").map((p) => (
               <li key={p.slug}>
-                <Link className="hover:text-white hover:underline underline-offset-4" href={productHref(p)}>
+                <Link className="inline-block py-1 hover:text-white hover:underline underline-offset-4" href={productHref(p)}>
                   {p.name}
                 </Link>
               </li>
@@ -33,10 +33,10 @@ export default function Footer() {
 
         <div>
           <h2 className="font-display text-lg text-white">Congelados IQF</h2>
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-3 space-y-1">
             {byCategory("congelados").map((p) => (
               <li key={p.slug}>
-                <Link className="hover:text-white hover:underline underline-offset-4" href={productHref(p)}>
+                <Link className="inline-block py-1 hover:text-white hover:underline underline-offset-4" href={productHref(p)}>
                   {p.name}
                 </Link>
               </li>
@@ -44,21 +44,21 @@ export default function Footer() {
           </ul>
         </div>
 
-        <div>
+        <div className="col-span-2 md:col-span-1">
           <h2 className="font-display text-lg text-white">Contacto</h2>
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-3 space-y-1">
             <li>
-              <a className="hover:text-white hover:underline underline-offset-4" href={`mailto:${site.email}`}>
+              <a className="inline-block py-1 hover:text-white hover:underline underline-offset-4" href={`mailto:${site.email}`}>
                 {site.email}
               </a>
             </li>
             <li>
-              <a className="hover:text-white hover:underline underline-offset-4" href={site.phoneHref}>
+              <a className="inline-block py-1 hover:text-white hover:underline underline-offset-4" href={site.phoneHref}>
                 {site.phone}
               </a>
             </li>
             <li>
-              <a className="hover:text-white hover:underline underline-offset-4" href={site.catalog} download>
+              <a className="inline-block py-1 hover:text-white hover:underline underline-offset-4" href={site.catalog} download>
                 Catálogo en PDF
               </a>
             </li>

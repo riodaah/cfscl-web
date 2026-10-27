@@ -6,11 +6,11 @@ import { site } from "@/lib/site";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-export default function ContactForm() {
+export default function ContactForm({ defaultProduct = "" }: { defaultProduct?: string }) {
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [errorText, setErrorText] = useState("");
-  const [product, setProduct] = useState("");
+  const [product, setProduct] = useState(defaultProduct);
   const startedAt = useRef(0);
   const doneRef = useRef<HTMLDivElement>(null);
 

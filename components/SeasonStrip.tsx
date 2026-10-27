@@ -11,18 +11,18 @@ export default function SeasonStrip({ product }: { product: Product }) {
   useEffect(() => setNow(new Date().getMonth() + 1), []);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-9">
       {product.seasons.map((season) => {
         const inSeasonNow = now ? season.months.includes(now) : null;
         return (
           <div key={season.origin}>
             <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
               <h3 className="font-display text-xl font-bold">Temporada {season.origin}</h3>
-              <p className="text-niebla">
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-niebla">
                 {seasonLabel(season)}
                 {inSeasonNow !== null && (
                   <span
-                    className={`mt-2 sm:mt-0 sm:ml-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-sm font-semibold ${
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-sm font-semibold ${
                       inSeasonNow ? "bg-verde text-white" : "bg-hoja-2 text-niebla"
                     }`}
                   >
@@ -32,13 +32,56 @@ export default function SeasonStrip({ product }: { product: Product }) {
               </p>
             </div>
 
-            <ol className="mt-4 grid grid-cols-12 gap-y-2" aria-label={`Meses de temporada ${season.origin}`}>
+            {/* Celular: 2 filas de 6 meses, nombres completos y fácil de leer */}
+            <ol className="mt-4 grid grid-cols-6 gap-1.5 sm:hidden" aria-label={`Meses de temporada ${season.origin}`}>
+              {MONTHS.map((m, i) => {
+                const month = i + 1;
+                const shape = cellShape(season, month);
+                const isNow = month === now;
+                const fill = shape
+                  ? shape.half === "left"
+                    ? `linear-gradient(90deg, ${product.color} 50%, color-mix(in oklab, ${product.color} 30%, white) 50%)`
+                    : shape.half === "right"
+                      ? `linear-gradient(90deg, color-mix(in oklab, ${product.color} 30%, white) 50%, ${product.color} 50%)`
+                      : shape.faded
+                        ? `color-mix(in oklab, ${product.color} 55%, white)`
+                        : product.color
+                  : undefined;
+                return (
+                  <motion.li
+                    key={m}
+                    initial={reduce ? false : { opacity: 0, scale: 0.85 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.3, delay: i * 0.035, ease: [0.22, 1, 0.36, 1] }}
+                    className={`relative grid h-14 place-items-center rounded-xl text-[0.9rem] font-semibold ${
+                      shape ? "text-white" : "bg-hoja text-niebla"
+                    } ${isNow ? "ring-2 ring-rojo ring-offset-2 ring-offset-white" : ""}`}
+                    style={fill ? { background: fill } : undefined}
+                  >
+                    <span aria-hidden>{m}</span>
+                    {isNow && (
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-rojo px-1.5 text-[0.6rem] font-bold leading-4 text-white" aria-hidden>
+                        hoy
+                      </span>
+                    )}
+                    <span className="sr-only">
+                      {MONTHS_LONG[i]}: {shape ? (shape.half || shape.faded ? "disponible parte del mes" : "disponible") : "sin cosecha"}
+                      {isNow ? " (mes actual)" : ""}
+                    </span>
+                  </motion.li>
+                );
+              })}
+            </ol>
+
+            {/* Tablet y escritorio: barra continua */}
+            <ol className="mt-4 hidden grid-cols-12 gap-y-2 sm:grid" aria-label={`Meses de temporada ${season.origin}`}>
               {MONTHS.map((m, i) => {
                 const month = i + 1;
                 const shape = cellShape(season, month);
                 return (
                   <li key={m} className="relative flex flex-col items-center">
-                    <div className="relative h-9 sm:h-11 w-full">
+                    <div className="relative h-11 w-full">
                       <span className="absolute inset-x-[18%] top-1/2 h-[2px] -translate-y-1/2 rounded bg-linea" aria-hidden />
                       {shape && (
                         <motion.span
@@ -65,9 +108,8 @@ export default function SeasonStrip({ product }: { product: Product }) {
                         <span className="absolute -top-2 -bottom-1 left-1/2 w-[2px] -translate-x-1/2 rounded bg-rojo" aria-hidden />
                       )}
                     </div>
-                    <span className={`text-[0.72rem] sm:text-sm ${shape ? "font-semibold text-tinta" : "text-niebla"}`}>
-                      <span className="sm:hidden" aria-hidden>{m[0]}</span>
-                      <span className="hidden sm:inline" aria-hidden>{m}</span>
+                    <span className={`text-sm ${shape ? "font-semibold text-tinta" : "text-niebla"}`} aria-hidden>
+                      {m}
                     </span>
                     <span className="sr-only">
                       {MONTHS_LONG[i]}: {shape ? (shape.half ? "disponible parte del mes" : "disponible") : "sin cosecha"}
