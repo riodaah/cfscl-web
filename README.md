@@ -40,6 +40,7 @@ Corre `npm run assets` una vez en tu equipo y **commitea la carpeta `public/`**.
 | `CONTACT_TO` | Destinatarios, separados por coma. Por defecto `info@cfscl.cl` |
 | `CONTACT_FROM` | Remitente verificado en Resend, ej. `Web CFS <web@cfscl.cl>` |
 | `LEAD_WEBHOOK_URL` | (Opcional) Webhook de n8n/Make para registrar cada solicitud en el CRM |
+| `NEXT_PUBLIC_SITE_URL` | (Opcional) Dominio público, ej. `https://www.cfscl.cl`. Si no se define, se usa el dominio de producción de Vercel |
 
 Se necesita al menos `RESEND_API_KEY` o `LEAD_WEBHOOK_URL`. Sin ninguna, el formulario muestra al visitante el correo y teléfono de CFS para que escriba directo.
 

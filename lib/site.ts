@@ -1,7 +1,21 @@
+/**
+ * Dominio público del sitio, usado en enlaces para compartir, canonical, sitemap y datos estructurados.
+ * 1. NEXT_PUBLIC_SITE_URL si se define en Vercel (ej. https://www.cfscl.cl).
+ * 2. Si no, el dominio de producción que Vercel asigna (cfscl-web.vercel.app hoy; www.cfscl.cl cuando se conecte).
+ * 3. Respaldo: https://www.cfscl.cl
+ */
+function resolveSiteUrl() {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit.replace(/\/$/, "");
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercel) return `https://${vercel}`;
+  return "https://www.cfscl.cl";
+}
+
 export const site = {
   name: "CFS",
   legalName: "Central Frutícola Sur",
-  url: "https://www.cfscl.cl",
+  url: resolveSiteUrl(),
   title: "CFS | Exportación de frutas frescas y congeladas de Chile y Perú",
   description:
     "CFS (Central Frutícola Sur) exporta cerezas, uvas, manzanas, arándanos y fruta congelada IQF de calidad premium desde Chile y Perú a Asia, Europa y Norteamérica. Más de 20 años de trayectoria.",
