@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { byCategory } from "@/lib/products";
+import { byCategory, tx } from "@/lib/products";
 import { site } from "@/lib/site";
+import { t, type Lang } from "@/lib/i18n";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-export default function ContactForm({ defaultProduct = "" }: { defaultProduct?: string }) {
+export default function ContactForm({ lang, defaultProduct = "" }: { lang: Lang; defaultProduct?: string }) {
+  const d = t(lang);
+  const f = d.form;
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [errorText, setErrorText] = useState("");
@@ -16,7 +19,7 @@ export default function ContactForm({ defaultProduct = "" }: { defaultProduct?: 
 
   useEffect(() => {
     startedAt.current = Date.now();
-    const p = new URLSearchParams(window.location.search).get("producto");
+    const p = new URLSearchParams(window.location.search).get(lang === "en" ? "product" : "producto");
     if (p) setProduct(p);
   }, []);
 
@@ -31,7 +34,7 @@ export default function ContactForm({ defaultProduct = "" }: { defaultProduct?: 
       const res = await fetch("/api/contacto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, t: startedAt.current }),
+        body: JSON.stringify({ ...data, idioma: lang, t: startedAt.current }),
       });
       const json = await res.json().catch(() => ({}));
       if (res.ok && json.ok) {
@@ -49,9 +52,7 @@ export default function ContactForm({ defaultProduct = "" }: { defaultProduct?: 
       throw new Error();
     } catch {
       setStatus("error");
-      setErrorText(
-        `No pudimos enviar tu solicitud desde aquí. Escríbenos a ${site.email} o llámanos al ${site.phone} y te respondemos en el día.`
-      );
+      setErrorText(f.fail(site.email, site.phone));
     }
   }
 
@@ -61,13 +62,10 @@ export default function ContactForm({ defaultProduct = "" }: { defaultProduct?: 
         <div className="grid h-12 w-12 place-items-center rounded-full bg-verde text-white" aria-hidden>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6"><path d="M5 12.5l4.5 4.5L19 7.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </div>
-        <h3 className="mt-5 display-md">Solicitud enviada</h3>
-        <p className="mt-3 max-w-prose text-niebla">
-          Un ejecutivo de CFS revisará tu solicitud y te contactará por correo con disponibilidad, calibres y condiciones de
-          despacho.
-        </p>
+        <h3 className="mt-5 display-md">{f.sentTitle}</h3>
+        <p className="mt-3 max-w-prose text-niebla">{f.sentText}</p>
         <button type="button" onClick={() => setStatus("idle")} className="btn btn-linea mt-6 text-huerto">
-          Enviar otra solicitud
+          {f.again}
         </button>
       </div>
     );
@@ -85,30 +83,30 @@ export default function ContactForm({ defaultProduct = "" }: { defaultProduct?: 
     <form onSubmit={onSubmit} noValidate className="rounded-3xl bg-white p-6 sm:p-10 shadow-[inset_0_0_0_1px_var(--color-linea)]">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label htmlFor="nombre" className="label">Nombre y apellido</label>
+          <label htmlFor="nombre" className="label">{f.name}</label>
           <input id="nombre" name="nombre" required autoComplete="name" className="field" aria-invalid={!!errors.nombre} aria-describedby={describedBy("nombre")} />
           {err("nombre")}
         </div>
         <div>
-          <label htmlFor="empresa" className="label">Empresa <span className="font-normal text-niebla">(opcional)</span></label>
+          <label htmlFor="empresa" className="label">{f.company} <span className="font-normal text-niebla">{f.optional}</span></label>
           <input id="empresa" name="empresa" autoComplete="organization" className="field" />
         </div>
         <div>
-          <label htmlFor="email" className="label">Correo</label>
+          <label htmlFor="email" className="label">{f.email}</label>
           <input id="email" name="email" type="email" required autoComplete="email" className="field" aria-invalid={!!errors.email} aria-describedby={describedBy("email")} />
           {err("email")}
         </div>
         <div>
-          <label htmlFor="telefono" className="label">Teléfono o WhatsApp <span className="font-normal text-niebla">(opcional)</span></label>
+          <label htmlFor="telefono" className="label">{f.phone} <span className="font-normal text-niebla">{f.optional}</span></label>
           <input id="telefono" name="telefono" type="tel" autoComplete="tel" className="field" />
         </div>
         <div>
-          <label htmlFor="pais" className="label">País de destino</label>
+          <label htmlFor="pais" className="label">{f.country}</label>
           <input id="pais" name="pais" required autoComplete="country-name" className="field" aria-invalid={!!errors.pais} aria-describedby={describedBy("pais")} />
           {err("pais")}
         </div>
         <div>
-          <label htmlFor="producto" className="label">Producto de interés</label>
+          <label htmlFor="producto" className="label">{f.product}</label>
           <select
             id="producto"
             name="producto"
@@ -118,32 +116,32 @@ export default function ContactForm({ defaultProduct = "" }: { defaultProduct?: 
             aria-invalid={!!errors.producto}
             aria-describedby={describedBy("producto")}
           >
-            <option value="">Selecciona una fruta</option>
-            <optgroup label="Frescos">
+            <option value="">{f.choose}</option>
+            <optgroup label={d.fresh}>
               {byCategory("frescos").map((p) => (
-                <option key={p.formName} value={p.formName}>{p.name}</option>
+                <option key={p.es.formName} value={p.es.formName}>{tx(p, lang).name}</option>
               ))}
             </optgroup>
-            <optgroup label="Congelados IQF">
+            <optgroup label={d.frozen}>
               {byCategory("congelados").map((p) => (
-                <option key={p.formName} value={p.formName}>{p.name} congelado</option>
+                <option key={p.es.formName} value={p.es.formName}>{tx(p, lang).name} {f.frozenSuffix}</option>
               ))}
             </optgroup>
-            <option value="Varios productos">Varios productos</option>
+            <option value="Varios productos">{f.several}</option>
           </select>
           {err("producto")}
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="volumen" className="label">Volumen estimado <span className="font-normal text-niebla">(opcional)</span></label>
-          <input id="volumen" name="volumen" placeholder="Ej.: 2 contenedores de 40' en enero" className="field" />
+          <label htmlFor="volumen" className="label">{f.volume} <span className="font-normal text-niebla">{f.optional}</span></label>
+          <input id="volumen" name="volumen" placeholder={f.volumePh} className="field" />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="mensaje" className="label">Mensaje <span className="font-normal text-niebla">(opcional)</span></label>
-          <textarea id="mensaje" name="mensaje" rows={4} placeholder="Variedades, calibres, embalaje o puerto de destino" className="field resize-y" />
+          <label htmlFor="mensaje" className="label">{f.message} <span className="font-normal text-niebla">{f.optional}</span></label>
+          <textarea id="mensaje" name="mensaje" rows={4} placeholder={f.messagePh} className="field resize-y" />
         </div>
         {/* Campo trampa: los bots lo completan, las personas no lo ven */}
         <div className="hidden" aria-hidden>
-          <label htmlFor="website">No completar</label>
+          <label htmlFor="website">{lang === "en" ? "Leave empty" : "No completar"}</label>
           <input id="website" name="website" tabIndex={-1} autoComplete="off" />
         </div>
       </div>
@@ -155,9 +153,9 @@ export default function ContactForm({ defaultProduct = "" }: { defaultProduct?: 
       )}
 
       <div className="mt-8 flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-niebla max-w-sm">Un ejecutivo te responde por correo, normalmente dentro del día hábil.</p>
+        <p className="text-sm text-niebla max-w-sm">{f.response}</p>
         <button type="submit" disabled={status === "sending"} className="btn btn-rojo justify-center text-lg disabled:opacity-70">
-          {status === "sending" ? "Enviando…" : "Enviar solicitud"}
+          {status === "sending" ? f.sending : f.send}
         </button>
       </div>
     </form>

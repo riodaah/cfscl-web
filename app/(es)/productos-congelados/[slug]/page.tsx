@@ -1,0 +1,14 @@
+import { ProductPage, productPageMetadata, productParams } from "@/components/Pages";
+
+export const dynamicParams = false;
+export const generateStaticParams = () => productParams("congelados", "es");
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  return productPageMetadata("congelados", slug, "es");
+}
+
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  return <ProductPage c="congelados" slug={slug} lang="es" />;
+}

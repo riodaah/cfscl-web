@@ -25,9 +25,9 @@ npm run dev      # http://localhost:3000
 
 `scripts/fetch-assets.mjs` descarga las fotos originales, el logo, las certificaciones, el mapa y el catálogo PDF desde Wix, y genera:
 
-- `public/media/*.webp` — fotos optimizadas
+- `public/media/*.webp` — fotos optimizadas (la portada `huerto.webp` es un huerto de manzanos de Unsplash; reemplázala por una foto propia de CFS con el mismo nombre)
 - `public/media/logo.png`, `public/favicon-48.png`, `public/icon-*.png`, `public/apple-touch-icon.png`
-- `public/og.jpg` y `public/media/og-*.jpg` — imágenes que aparecen al compartir el enlace (foto + logo)
+- `public/og-cfs.jpg` y `public/media/og-*.jpg` — imágenes que aparecen al compartir el enlace (foto + logo)
 - `public/catalogo-cfs.pdf`
 
 Corre `npm run assets` una vez en tu equipo y **commitea la carpeta `public/`**. Desde ahí el sitio ya no depende de Wix. Para reemplazar una foto, pon el nuevo `.webp` con el mismo nombre en `public/media/` (y borra su `og-*.jpg` + vuelve a correr el script si quieres regenerar la imagen para compartir). Para un catálogo nuevo, reemplaza `public/catalogo-cfs.pdf`.

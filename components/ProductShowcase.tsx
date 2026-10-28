@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Photo from "./Photo";
-import { byCategory, productHref, seasonLabel, type Category } from "@/lib/products";
+import { byCategory, productHref, seasonLine, tx, type Category } from "@/lib/products";
+import { route, t, type Lang } from "@/lib/i18n";
 
-export default function ProductShowcase({ initial = "frescos" }: { initial?: Category }) {
+export default function ProductShowcase({ lang, initial = "frescos" }: { lang: Lang; initial?: Category }) {
+  const d = t(lang);
   const [cat, setCat] = useState<Category>(initial);
   const reduce = useReducedMotion();
   const items = byCategory(cat);
@@ -25,7 +27,7 @@ export default function ProductShowcase({ initial = "frescos" }: { initial?: Cat
 
   return (
     <div>
-      <div role="group" aria-label="Tipo de producto" className="inline-flex rounded-full bg-white p-1 shadow-[inset_0_0_0_1px_var(--color-linea)]">
+      <div role="group" aria-label={d.productType} className="inline-flex rounded-full bg-white p-1 shadow-[inset_0_0_0_1px_var(--color-linea)]">
         {(["frescos", "congelados"] as Category[]).map((c) => (
           <button
             key={c}
@@ -33,7 +35,7 @@ export default function ProductShowcase({ initial = "frescos" }: { initial?: Cat
             onClick={() => setCat(c)}
             className={`rounded-full px-5 py-2.5 font-semibold transition-colors ${cat === c ? "bg-huerto text-white" : "text-niebla hover:text-tinta"}`}
           >
-            {c === "frescos" ? "Frescos" : "Congelados IQF"}
+            {c === "frescos" ? d.fresh : d.frozen}
           </button>
         ))}
       </div>
@@ -52,7 +54,7 @@ export default function ProductShowcase({ initial = "frescos" }: { initial?: Cat
           {items.map((p, i) => (
             <li key={p.slug} className={`w-[82%] shrink-0 snap-start sm:w-auto ${i === 0 ? "sm:col-span-2 lg:row-span-2" : i >= 5 ? "lg:col-span-2" : ""}`}>
               <Link
-                href={productHref(p)}
+                href={productHref(p, lang)}
                 className="group relative flex h-[25rem] flex-col justify-end overflow-hidden rounded-3xl text-white sm:h-full sm:min-h-[15rem]"
               >
                 <Photo
@@ -64,11 +66,11 @@ export default function ProductShowcase({ initial = "frescos" }: { initial?: Cat
                 <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" aria-hidden />
                 <span className="relative p-5 sm:p-6">
                   <span className={`block font-display text-4xl font-bold tracking-tight ${i === 0 ? "sm:text-5xl" : "sm:text-2xl"}`}>
-                    {p.name}
+                    {tx(p, lang).name}
                   </span>
-                  <span className={`mt-2 block max-w-md text-white/85 ${i === 0 ? "" : "sm:hidden"}`}>{p.tagline}</span>
+                  <span className={`mt-2 block max-w-md text-white/85 ${i === 0 ? "" : "sm:hidden"}`}>{tx(p, lang).tagline}</span>
                   <span className="mt-2 block text-sm text-white/80">
-                    {p.seasons.map((s) => `${s.origin}: ${seasonLabel(s)}`).join(" · ")}
+                    {seasonLine(p, lang)}
                   </span>
                 </span>
               </Link>
@@ -84,8 +86,8 @@ export default function ProductShowcase({ initial = "frescos" }: { initial?: Cat
             <span key={p.slug} className={`h-1.5 rounded-full transition-all duration-300 ${i === active ? "w-6 bg-huerto" : "w-1.5 bg-linea"}`} />
           ))}
         </div>
-        <Link href={cat === "frescos" ? "/productos" : "/productos-congelados"} className="font-semibold text-verde underline underline-offset-4">
-          Ver todos
+        <Link href={route(cat === "frescos" ? "products" : "frozen", lang)} className="font-semibold text-verde underline underline-offset-4">
+          {d.seeAll}
         </Link>
       </div>
     </div>

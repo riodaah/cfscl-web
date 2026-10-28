@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { formOptions } from "@/lib/products";
+import { t } from "@/lib/i18n";
 
 // Recibe las solicitudes de cotización del formulario.
 // Variables de entorno (Vercel → Settings → Environment Variables):
@@ -17,6 +18,7 @@ type Lead = {
   producto: string;
   volumen: string;
   mensaje: string;
+  idioma: "es" | "en";
 };
 
 const clean = (v: unknown, max = 500) => (typeof v === "string" ? v.trim().slice(0, max) : "");
@@ -45,13 +47,15 @@ export async function POST(req: Request) {
     producto: clean(body.producto, 80),
     volumen: clean(body.volumen, 120),
     mensaje: clean(body.mensaje, 3000),
+    idioma: body.idioma === "en" ? "en" : "es",
   };
+  const f = t(lead.idioma).form;
 
   const errors: Record<string, string> = {};
-  if (!lead.nombre) errors.nombre = "Escribe tu nombre.";
-  if (!lead.pais) errors.pais = "Indica tu país.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(lead.email)) errors.email = "Revisa el correo: falta @ o el dominio.";
-  if (lead.producto && lead.producto !== "Varios productos" && !formOptions.includes(lead.producto)) errors.producto = "Elige un producto de la lista.";
+  if (!lead.nombre) errors.nombre = f.errName;
+  if (!lead.pais) errors.pais = f.errCountry;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(lead.email)) errors.email = f.errEmail;
+  if (lead.producto && lead.producto !== "Varios productos" && !formOptions.includes(lead.producto)) errors.producto = f.errProduct;
   if (Object.keys(errors).length) return NextResponse.json({ ok: false, errors }, { status: 422 });
 
   const resendKey = process.env.RESEND_API_KEY;
@@ -72,6 +76,7 @@ export async function POST(req: Request) {
       ["Teléfono", lead.telefono || "—"],
       ["Producto", lead.producto || "—"],
       ["Volumen estimado", lead.volumen || "—"],
+      ["Idioma del sitio", lead.idioma === "en" ? "Inglés (cliente internacional)" : "Español"],
     ];
     const html = `
       <div style="font-family:Arial,sans-serif;color:#13241a">
@@ -89,7 +94,7 @@ export async function POST(req: Request) {
           from: process.env.CONTACT_FROM || "Web CFS <onboarding@resend.dev>",
           to: (process.env.CONTACT_TO || "info@cfscl.cl").split(",").map((s) => s.trim()),
           reply_to: lead.email,
-          subject: `Cotización web: ${lead.producto || "consulta"} — ${lead.empresa || lead.nombre} (${lead.pais})`,
+          subject: `${lead.idioma === "en" ? "[EN] " : ""}Cotización web: ${lead.producto || "consulta"} — ${lead.empresa || lead.nombre} (${lead.pais})`,
           html,
         }),
       })

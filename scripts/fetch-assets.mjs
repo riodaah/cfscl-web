@@ -19,7 +19,8 @@ const brand = { deep: "#0B3B22", green: "#0C7336" };
 
 // nombre local -> archivo original en Wix
 const photos = {
-  hero: "fa66ac_a48d6147bb524573a244c39aa3bc1f9f~mv2.png",
+  // Portada: huerto de manzanos (Unsplash, Michael Weidner, licencia Unsplash). Reemplazar por una foto propia de CFS cuando exista.
+  huerto: "https://images.unsplash.com/photo-1537811465496-6c38a51d2d81?w=2600&q=85&fm=jpg",
   cerezas: "fa66ac_f59121f51d104325a52fdc557be1a98b~mv2.png",
   ciruela: "fa66ac_1af35cba354e4d9ca2ac8af75806038a~mv2.png",
   granada: "fa66ac_f3f38473ccab42efb3aad55f606fc268~mv2.png",
@@ -37,7 +38,7 @@ const photos = {
   "noticia-asia-fruit-logistica": "fa66ac_55ec33347c9b4263b965282895b812e2~mv2.jpeg",
   mercados: "fa66ac_3fa4ce928cc648f3a5c4528d62ee3c98~mv2.png",
 };
-const PRODUCT_KEYS = Object.keys(photos).filter((k) => !["hero", "noticia-asia-fruit-logistica", "mercados"].includes(k));
+const PRODUCT_KEYS = Object.keys(photos).filter((k) => !["huerto", "noticia-asia-fruit-logistica", "mercados"].includes(k));
 
 const LOGO = "fa66ac_e24ed5c052d04afd80587946de71d4ab~mv2.png";
 const CERTS = "fa66ac_700e7ad449ee4cc5a1d5e62b0111bf06~mv2.png";
@@ -65,7 +66,7 @@ async function step(label, outFile, fn) {
 
 const cache = new Map();
 const src = (file) => {
-  if (!cache.has(file)) cache.set(file, download(WIX + file));
+  if (!cache.has(file)) cache.set(file, download(file.startsWith("http") ? file : WIX + file));
   return cache.get(file);
 };
 
@@ -75,7 +76,7 @@ async function main() {
 
   for (const [name, file] of Object.entries(photos)) {
     await step(`${name}.webp`, path.join(MEDIA, `${name}.webp`), async () => {
-      const width = name === "hero" ? 2400 : 1800;
+      const width = name === "huerto" ? 2400 : 1800;
       const out = await sharp(await src(file)).resize({ width, withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
       await writeFile(path.join(MEDIA, `${name}.webp`), out);
     });
@@ -118,7 +119,7 @@ async function main() {
     const out = await sharp(photo).composite([{ input: shade }, { input: badge, left: Math.round((W - badgeSize) / 2), top: Math.round((H - badgeSize) / 2) }]).jpeg({ quality: 82 }).toBuffer();
     await writeFile(outFile, out);
   };
-  await step("og.jpg", path.join(PUBLIC, "og.jpg"), () => ogCard(path.join(MEDIA, "hero.webp"), path.join(PUBLIC, "og.jpg")));
+  await step("og-cfs.jpg", path.join(PUBLIC, "og-cfs.jpg"), () => ogCard(path.join(MEDIA, "huerto.webp"), path.join(PUBLIC, "og-cfs.jpg")));
   for (const key of PRODUCT_KEYS) {
     await step(`og-${key}.jpg`, path.join(MEDIA, `og-${key}.jpg`), () => ogCard(path.join(MEDIA, `${key}.webp`), path.join(MEDIA, `og-${key}.jpg`)));
   }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Photo from "./Photo";
-import { byCategory, productHref, seasonLabel, type Category } from "@/lib/products";
+import { byCategory, productHref, seasonLine, tx, type Category } from "@/lib/products";
+import type { Lang } from "@/lib/i18n";
 
 export function PageIntro({ title, intro, children }: { title: string; intro?: string; children?: React.ReactNode }) {
   return (
@@ -12,13 +13,13 @@ export function PageIntro({ title, intro, children }: { title: string; intro?: s
   );
 }
 
-export default function ProductGrid({ category, headingLevel = 2 }: { category: Category; headingLevel?: 2 | 3 }) {
+export default function ProductGrid({ lang, category, headingLevel = 2 }: { lang: Lang; category: Category; headingLevel?: 2 | 3 }) {
   const H = headingLevel === 2 ? "h2" : "h3";
   return (
     <ul className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3">
       {byCategory(category).map((p) => (
         <li key={p.slug}>
-          <Link href={productHref(p)} className="group block">
+          <Link href={productHref(p, lang)} className="group block">
             <div className="overflow-hidden rounded-2xl sm:rounded-3xl">
               <Photo
                 name={p.image}
@@ -28,12 +29,12 @@ export default function ProductGrid({ category, headingLevel = 2 }: { category: 
               />
             </div>
             <div className="mt-3 flex items-baseline justify-between gap-2 sm:mt-4 sm:gap-4">
-              <H className="font-display text-xl sm:text-2xl font-bold tracking-tight group-hover:underline underline-offset-4">{p.name}</H>
+              <H className="font-display text-xl sm:text-2xl font-bold tracking-tight group-hover:underline underline-offset-4">{tx(p, lang).name}</H>
               <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: p.color }} aria-hidden />
             </div>
-            <p className="mt-1.5 hidden text-niebla sm:block">{p.tagline}</p>
+            <p className="mt-1.5 hidden text-niebla sm:block">{tx(p, lang).tagline}</p>
             <p className="mt-1 text-[0.82rem] leading-snug text-niebla sm:mt-2 sm:text-sm sm:font-medium sm:text-tinta">
-              {p.seasons.map((s) => `${s.origin}: ${seasonLabel(s)}`).join(" · ")}
+              {seasonLine(p, lang)}
             </p>
           </Link>
         </li>

@@ -2,10 +2,13 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
-import { MONTHS, MONTHS_LONG, seasonLabel, type Product } from "@/lib/products";
+import { MONTHS, MONTHS_LONG, originLabel, seasonLabel, type Product } from "@/lib/products";
+import { t, type Lang } from "@/lib/i18n";
 import { cellShape } from "./SeasonMatrix";
 
-export default function SeasonStrip({ product }: { product: Product }) {
+export default function SeasonStrip({ product, lang }: { product: Product; lang: Lang }) {
+  const d = t(lang);
+  const names = MONTHS_LONG[lang];
   const reduce = useReducedMotion();
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => setNow(new Date().getMonth() + 1), []);
@@ -14,27 +17,28 @@ export default function SeasonStrip({ product }: { product: Product }) {
     <div className="space-y-9">
       {product.seasons.map((season) => {
         const inSeasonNow = now ? season.months.includes(now) : null;
+        const origin = originLabel(season.origin, lang);
         return (
           <div key={season.origin}>
             <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-              <h3 className="font-display text-xl font-bold">Temporada {season.origin}</h3>
+              <h3 className="font-display text-xl font-bold">{d.seasonOf(origin)}</h3>
               <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-niebla">
-                {seasonLabel(season)}
+                {seasonLabel(season, lang)}
                 {inSeasonNow !== null && (
                   <span
                     className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-sm font-semibold ${
                       inSeasonNow ? "bg-verde text-white" : "bg-hoja-2 text-niebla"
                     }`}
                   >
-                    {inSeasonNow ? "Disponible este mes" : `Fuera de temporada en ${MONTHS_LONG[now! - 1]}`}
+                    {inSeasonNow ? d.inSeasonNow : d.outOfSeason(names[now! - 1])}
                   </span>
                 )}
               </p>
             </div>
 
             {/* Celular: 2 filas de 6 meses, nombres completos y fácil de leer */}
-            <ol className="mt-4 grid grid-cols-6 gap-1.5 sm:hidden" aria-label={`Meses de temporada ${season.origin}`}>
-              {MONTHS.map((m, i) => {
+            <ol className="mt-4 grid grid-cols-6 gap-1.5 sm:hidden" aria-label={d.monthsOf(origin)}>
+              {MONTHS[lang].map((m, i) => {
                 const month = i + 1;
                 const shape = cellShape(season, month);
                 const isNow = month === now;
@@ -62,12 +66,12 @@ export default function SeasonStrip({ product }: { product: Product }) {
                     <span aria-hidden>{m}</span>
                     {isNow && (
                       <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-rojo px-1.5 text-[0.6rem] font-bold leading-4 text-white" aria-hidden>
-                        hoy
+                        {d.today}
                       </span>
                     )}
                     <span className="sr-only">
-                      {MONTHS_LONG[i]}: {shape ? (shape.half || shape.faded ? "disponible parte del mes" : "disponible") : "sin cosecha"}
-                      {isNow ? " (mes actual)" : ""}
+                      {names[i]}: {shape ? (shape.half || shape.faded ? d.monthPartial : d.monthAvailable) : d.monthNone}
+                      {isNow ? d.currentMonth : ""}
                     </span>
                   </motion.li>
                 );
@@ -75,8 +79,8 @@ export default function SeasonStrip({ product }: { product: Product }) {
             </ol>
 
             {/* Tablet y escritorio: barra continua */}
-            <ol className="mt-4 hidden grid-cols-12 gap-y-2 sm:grid" aria-label={`Meses de temporada ${season.origin}`}>
-              {MONTHS.map((m, i) => {
+            <ol className="mt-4 hidden grid-cols-12 gap-y-2 sm:grid" aria-label={d.monthsOf(origin)}>
+              {MONTHS[lang].map((m, i) => {
                 const month = i + 1;
                 const shape = cellShape(season, month);
                 return (
@@ -112,7 +116,7 @@ export default function SeasonStrip({ product }: { product: Product }) {
                       {m}
                     </span>
                     <span className="sr-only">
-                      {MONTHS_LONG[i]}: {shape ? (shape.half ? "disponible parte del mes" : "disponible") : "sin cosecha"}
+                      {names[i]}: {shape ? (shape.half || shape.faded ? d.monthPartial : d.monthAvailable) : d.monthNone}
                     </span>
                   </li>
                 );
